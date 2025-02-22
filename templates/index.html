@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Discovery Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6C5CE7;
+            --secondary-color: #A8A4E6;
+            --background-color: #F0F3F8;
+            --text-color: #2D3436;
+            --message-bg: #FFFFFF;
+            --user-message-bg: #6C5CE7;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            color: var(--text-color);
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--message-bg);
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 25px;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .chat-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .user-message {
+            align-items: flex-end;
+        }
+
+        .bot-message {
+            align-items: flex-start;
+        }
+
+        .message-content {
+            padding: 12px 18px;
+            border-radius: 18px;
+            max-width: 70%;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: var(--transition);
+        }
+
+        .user-message .message-content {
+            background: var(--user-message-bg);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message .message-content {
+            background: var(--message-bg);
+            color: var(--text-color);
+            border-bottom-left-radius: 5px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .anime-image {
+            max-width: 250px;
+            border-radius: 12px;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: var(--transition);
+        }
+
+        .anime-image:hover {
+            transform: scale(1.02);
+        }
+
+        .input-container {
+            padding: 20px 25px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+            display: flex;
+            gap: 12px;
+            background: white;
+            border-radius: 0 0 20px 20px;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 12px 20px;
+            border: 2px solid rgba(108,92,231,0.2);
+            border-radius: 25px;
+            outline: none;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            transition: var(--transition);
+        }
+
+        #user-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(108,92,231,0.1);
+        }
+
+        .button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            background: var(--primary-color);
+            color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .button:hover {
+            background: #5849c4;
+            transform: translateY(-1px);
+        }
+
+        .button:active {
+            transform: translateY(0);
+        }
+
+        .genre-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .genre-button {
+            padding: 8px 15px;
+            border: 1px solid var(--primary-color);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .genre-button:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .chat-container {
+                height: 95vh;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .anime-image {
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>Anime Discovery Chat</h1>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="input-container">
+            <div class="option-buttons">
+                <button class="button" id="genre-option">Browse by Genre</button>
+                <button class="button" id="search-option">Search Anime</button>
+            </div>
+            <div class="genre-container" id="genre-container">
+                <button class="genre-button" data-genre="Action">Action</button>
+                <button class="genre-button" data-genre="Adventure">Adventure</button>
+                <button class="genre-button" data-genre="Comedy">Comedy</button>
+                <button class="genre-button" data-genre="Drama">Drama</button>
+                <button class="genre-button" data-genre="Fantasy">Fantasy</button>
+                <button class="genre-button" data-genre="Horror">Horror</button>
+                <button class="genre-button" data-genre="Mystery">Mystery</button>
+                <button class="genre-button" data-genre="Romance">Romance</button>
+                <button class="genre-button" data-genre="Sci-Fi">Sci-Fi</button>
+                <button class="genre-button" data-genre="Slice of Life">Slice of Life</button>
+                <button class="genre-button" data-genre="Sports">Sports</button>
+                <button class="genre-button" data-genre="Supernatural">Supernatural</button>
+            </div>
+            <div class="search-container" id="search-container">
+                <div class="input-row">
+                    <input type="text" id="user-input" placeholder="Enter anime name...">
+                    <button class="button" id="send-button">Search</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messagesContainer = document.getElementById('chat-messages');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const genreOption = document.getElementById('genre-option');
+            const searchOption = document.getElementById('search-option');
+            const genreContainer = document.getElementById('genre-container');
+            const searchContainer = document.getElementById('search-container');
+            let isWaitingForResponse = false;
+
+            // Initial message
+            addMessage("👋 Welcome to Anime Discovery Chat! Please choose an option above:\n\n1. Browse by Genre: Explore anime by different genres\n2. Search Anime: Look up information about a specific anime", false);
+
+            function toggleOption(option) {
+                if (option === 'genre') {
+                    genreContainer.style.display = 'flex';
+                    searchContainer.style.display = 'none';
+                    genreOption.classList.add('active');
+                    searchOption.classList.remove('active');
+                } else {
+                    genreContainer.style.display = 'none';
+                    searchContainer.style.display = 'flex';
+                    searchOption.classList.add('active');
+                    genreOption.classList.remove('active');
+                }
+            }
+
+            genreOption.addEventListener('click', () => toggleOption('genre'));
+            searchOption.addEventListener('click', () => toggleOption('search'));
+
+            function addMessage(message, isUser, imageUrl = null) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+                
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                messageContent.textContent = message;
+                messageDiv.appendChild(messageContent);
+
+                if (imageUrl) {
+                    const image = document.createElement('img');
+                    image.src = imageUrl;
+                    image.className = 'anime-image';
+                    messageDiv.appendChild(image);
+                }
+
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            async function handleRequest(message, type) {
+                if (!message || isWaitingForResponse) return;
+                
+                isWaitingForResponse = true;
+                addMessage(message, true);
+                
+                try {
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            message: type === 'search' ? `tell me about ${message}` : message,
+                            type: type
+                        })
+                    });
+
+                    const data = await response.json();
+                    addMessage(data.response, false, data.image_url);
+                } catch (error) {
+                    addMessage('Sorry, something went wrong. Please try again.', false);
+                }
+
+                isWaitingForResponse = false;
+            }
+
+            // Handle genre button clicks
+            document.querySelectorAll('.genre-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    handleRequest(button.dataset.genre, 'genre');
+                });
+            });
+
+            // Handle anime search
+            function handleSearch() {
+                const message = userInput.value.trim();
+                if (message) {
+                    handleRequest(message, 'search');
+                    userInput.value = '';
+                }
+            }
+
+            sendButton.addEventListener('click', handleSearch);
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !isWaitingForResponse) {
+                    handleSearch();
+                }
+            });
+
+            // Start with genre option active
+            toggleOption('genre');
+        });
+    </script>
+</body>
+</html>
